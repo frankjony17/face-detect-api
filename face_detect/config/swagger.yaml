@@ -1,0 +1,132 @@
+swagger: '2.0'
+
+info:
+  version: 0.1.1
+  title: Face Detection API
+  description: 'Detect the faces that an image contains, return the bounding boxes of each face.'
+  contact:
+    email: frankjony17@gmail.com
+
+schemes:
+  - http
+
+tags:
+  - name: Face detection
+    description: 'Detect the faces contained in the image.'
+
+paths:
+  /image/face-detect:
+    post:
+      tags:
+        - Face detection
+      description: 'Return the bounding boxes of each face contained in the image.'
+      parameters:
+        - name: image_face
+          in: body
+          required: true
+          description: 'Image encoded in base64 and cropped boolean (determine if the faces found in the image should be returned).'
+          schema:
+            $ref: '#/definitions/ImageFace'
+      responses:
+        '200':
+          description: 'OK'
+          schema:
+            $ref: '#/definitions/Response200'
+        '400':
+          description: 'Bad Request, wrong syntax'
+          schema:
+            $ref: '#/definitions/Error400'
+        '400-1':
+          description: 'Bad Request, wrong base64'
+          schema:
+            $ref: '#/definitions/Error400-1'
+        '400-4':
+          description: 'Bad Request, required parameters missing'
+          schema:
+            $ref: '#/definitions/Error400-4'
+        '400-5':
+          description: 'Bad Request, face not found.'
+          schema:
+            $ref: '#/definitions/Error400-5'
+        '400-8':
+          description: 'Bad Request, required value is invalid.'
+          schema:
+            $ref: '#/definitions/Error400-8'
+
+definitions:
+  ImageFace:
+    type: object
+    required:
+      - image
+      - cropped
+    properties:
+      image:
+        type: string
+        example: 'ZXhhbXBsZQ=='
+      cropped:
+        type: bool
+        example: True
+
+  Response200:
+    type: object
+    properties:
+    example: {
+      "number_of_faces": 1,
+      "cropped_faces": true,
+      "data": [{
+         "bounding_box": [{'left': 45, 'top': 294, 'right': 194, 'bottom': 443}],
+         "cropped_face": 'ZXhhbXBsZQ=='
+       }]
+    }
+
+  Error400:
+    type: object
+    properties:
+      message:
+        type: string
+        example: 'Bad Request, wrong syntax'
+      details:
+        type: string
+        example: 'The request could not be understood by the server due to
+        malformed syntax. The client SHOULD NOT repeat the request without
+        modifications.'
+
+  Error400-1:
+    type: object
+    properties:
+      message:
+        type: string
+        example: 'Bad Request, wrong base64'
+      details:
+        type: string
+        example: 'Wrong base64 format.'
+
+  Error400-4:
+    type: object
+    properties:
+      message:
+        type: string
+        example: 'Bad Request, required parameters missing'
+      details:
+        type: string
+        example: "Required parameters wasn't found."
+
+  Error400-5:
+    type: object
+    properties:
+      message:
+        type: string
+        example: 'Bad Request, face not found.'
+      details:
+        type: string
+        example: "Face not found, a face was not found in the image."
+
+  Error400-8:
+    type: object
+    properties:
+      message:
+        type: string
+        example: 'Bad Request, required value is invalid.'
+      details:
+        type: string
+        example: "The value of the cropped parameter must be boolean (bool)."
